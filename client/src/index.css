@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+@import "tailwindcss";
+
+*{
+  font-family: "Outfix" , sans-serif;
+}
+
+@theme{
+  --color-primary: #5044E5
+}
+
+/* In your index.css or a global CSS file */
+
+@keyframes text-pulse-light {
+  0% {
+    text-shadow: 0 0 0px rgba(79, 70, 229, 0); /* No shadow */
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(79, 70, 229, 0.6); /* Soft glow with primary color */
+  }
+  100% {
+    text-shadow: 0 0 0px rgba(79, 70, 229, 0); /* Back to no shadow */
+  }
+}
+
+.animate-text-pulse-light {
+  animation: text-pulse-light 2s infinite ease-in-out; /* 2s duration, infinite, ease-in-out */
+}
