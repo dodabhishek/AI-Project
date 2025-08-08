@@ -7,7 +7,7 @@ export const auth = async (req, res, next) => {
         const user = await clerkClient.users.getUser(userId);
 
         if (!hasPremiumPlan && user.privateMetadata.free_usage) {
-            req.free_usage = user.privateMetadata.free_usage; // ✅ Use req
+            req.free_usage = user.privateMetadata.free_usage; 
         } else {
             await clerkClient.users.updateUserMetadata(userId, {
                 privateMetadata: {

@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 import { Sparkles,Edit } from 'lucide-react'
+import { useAuth } from '@clerk/clerk-react'
+
 const WriteArticle = () => {
+  const { getToken } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState('');
+  
   const articleLength = [
     {length:800, text:'Short(500-800 words)'},
     {length:1200, text:'Medium(800-1200 words)'},
@@ -12,7 +18,37 @@ const WriteArticle = () => {
 
   const onSubmitHandler = async (e)=>{
     e.preventDefault();
+    if (!input.trim()) return;
+    
+    setLoading(true);
+    try {
+      const token = await getToken();
+      const response = await fetch('http://localhost:4000/api/ai/generate-article', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          prompt: input,
+          length: selectedLength.length
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setGeneratedContent(data.content);
+      } else {
+        alert(data.message || 'Failed to generate article');
+      }
+    } catch (error) {
+      console.error('Error generating article:', error);
+      alert('Failed to generate article. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
+  
   return (
     <div className='h-full overflow-y-scroll p-6 items-start flex-wrap gap-4 flex 
     text-slate-700'>
@@ -34,10 +70,22 @@ const WriteArticle = () => {
             ))}
           </div>
           <br />
-          <button className='w-full flex justify-center items-center gap-2 bg-gradient-to-r
-          from-[#226BFF] to-[#65ADFF] text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer'>
-              <Edit className='w-5'/>
-              Generate article
+          <button 
+            type="submit"
+            disabled={loading}
+            className='w-full flex justify-center items-center gap-2 bg-gradient-to-r
+            from-[#226BFF] to-[#65ADFF] text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer disabled:opacity-50'>
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Edit className='w-5'/>
+                  Generate article
+                </>
+              )}
           </button>
         </form>
             {/* Right col */}
@@ -50,10 +98,16 @@ const WriteArticle = () => {
           </div>
 
           <div className='flex-1 flex justify-center items-center'>
-            <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
-              <Edit className='w-9 h-9'/>
-              <p>Enter a topic and Click "Generate article " to get started</p>
-            </div>
+            {generatedContent ? (
+              <div className='w-full h-full overflow-y-auto text-sm text-gray-700 whitespace-pre-wrap'>
+                {generatedContent}
+              </div>
+            ) : (
+              <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
+                <Edit className='w-9 h-9'/>
+                <p>Enter a topic and Click "Generate article " to get started</p>
+              </div>
+            )}
           </div>
 
         </div>
