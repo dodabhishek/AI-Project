@@ -4,6 +4,8 @@ import { clerkClient } from "@clerk/express";
 import { v2 as cloudinary } from "cloudinary";
 import FormData from 'form-data';
 import axios from "axios";
+import fs from 'fs';
+import pdf from 'pdf-parse/lib/pdf-parse.js';
 
 const AI = new OpenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -97,9 +99,6 @@ export const generateImage = async (req, res) => {
         const { prompt, publish } = req.body;
         const plan = req.plan;
 
-        if (!prompt) {
-            return res.status(400).json({ success: false, message: "Prompt is required" });
-        }
 
         if (plan !== 'premium') {
             return res.status(403).json({ success: false, message: "This feature is only available for premium subscriptions" });
@@ -111,16 +110,16 @@ export const generateImage = async (req, res) => {
         const { data: imageBuffer } = await axios.post('https://clipdrop-api.co/text-to-image/v1', formData, {
             headers: {
                 'x-api-key': process.env.CLIPDROP_API_KEY,
-                ...formData.getHeaders()
+                responseType : "arraybuffer",
             },
             responseType: "arraybuffer"
         });
 
         const base64Image = `data:image/png;base64,${Buffer.from(imageBuffer).toString('base64')}`;
 
-        const { secure_url } = await cloudinary.uploader.upload(base64Image, {
-            folder: `ai_creations/${userId}`
-        });
+        const { secure_url }  = await cloudinary.uploader.upload(base64Image);
+
+       
 
         await sql`
             INSERT INTO creations (user_id, prompt, content, type, publish)
@@ -128,6 +127,137 @@ export const generateImage = async (req, res) => {
         `;
 
         res.json({ success: true, content: secure_url });
+
+    } catch (error) {
+        console.error("Error in generateImage:", error);
+        res.status(500).json({ success: false, message: `An internal server error occurred: ${error.message}` });
+    }
+};
+
+export const removeImageBackground = async (req, res) => {
+    console.log('generateImage called');
+    try {
+        const { userId } = req.auth();
+       const {image} = req.file;
+        const plan = req.plan;
+
+  
+
+        if (plan !== 'premium') {
+            return res.status(403).json({ success: false, message: "This feature is only available for premium subscriptions" });
+        }
+
+        const formData = new FormData();
+        formData.append('prompt', prompt);
+
+        
+
+        const { secure_url }  = await cloudinary.uploader.upload(image.path, {
+            transformation: [
+                {
+                    effect : 'background_removal',
+                    background_removal : 'remove_the_background',
+                }
+            ]
+        });
+
+       
+
+        await sql`
+            INSERT INTO creations (user_id, prompt, content, type)
+            VALUES (${userId}, 'Remove background from image', ${secure_url}, 'image', )
+        `;
+
+        res.json({ success: true, content: secure_url });
+
+    } catch (error) {
+        console.error("Error in generateImage:", error);
+        res.status(500).json({ success: false, message: `An internal server error occurred: ${error.message}` });
+    }
+};
+
+export const removeImageObject = async (req, res) => {
+    console.log('generateImage called');
+    try {
+        const { userId } = req.auth();
+        const {object} = req.body;
+       const {image} = req.file;
+        const plan = req.plan;
+
+  
+
+        if (plan !== 'premium') {
+            return res.status(403).json({ success: false, message: "This feature is only available for premium subscriptions" });
+        }
+
+        const formData = new FormData();
+        formData.append('prompt', prompt);
+
+        
+
+        const { public_id }  = await cloudinary.uploader.upload(image.path);
+
+        const image_url =  cloudinary.url(public_id,{
+            transformation: [
+                {effect : `gen_remove : ${object}`}
+            ],
+            resource_type:'image'
+        });
+       
+
+        await sql`
+            INSERT INTO creations (user_id, prompt, content, type)
+            VALUES (${userId}, ${`Removed ${object} from image`}, ${image_url}, 'image', )
+        `;
+
+        res.json({ success: true, content: secure_url });
+
+    } catch (error) {
+        console.error("Error in generateImage:", error);
+        res.status(500).json({ success: false, message: `An internal server error occurred: ${error.message}` });
+    }
+};
+export const resumeReview = async (req, res) => {
+    console.log('generateImage called');
+    try {
+        const { userId } = req.auth();
+        const resume = req.file;
+        const plan = req.plan;
+
+  
+
+        if (plan !== 'premium') {
+            return res.status(403).json({ success: false, message: "This feature is only available for premium subscriptions" });
+        }
+
+        const formData = new FormData();
+        formData.append('prompt', prompt);
+
+        if(resume.size > 5* 1024 * 1024) {
+            res.json({success:false , message : `Resume file size exceeds allowed size (5MB).`});
+        }
+
+        const dataBuffer = fs.readFileSync(resume.path)
+        const pdfData = await pdf(dataBuffer);
+
+        const prompt = `Review the following resume and provide constructive feedback on its strengths, weaknesses,
+        and areas for improvement. Resume content: \n\n ${pdfData.text}`
+        
+           const response = await AI.chat.completions.create({
+        model: "gemini-1.5-flash", // Use correct Google API model name
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1000,
+    });
+
+    const content = response.choices[0].message.content;
+
+        await sql`
+            INSERT INTO creations (user_id, prompt, content, type)
+            VALUES (${userId},'Review the uploaded resume', ${content}, 'resume-review', )
+        `;
+
+        res.json({ success: true, content: content });
 
     } catch (error) {
         console.error("Error in generateImage:", error);
