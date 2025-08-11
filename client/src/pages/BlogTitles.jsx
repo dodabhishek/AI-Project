@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
 import { Sparkles, Edit, Hash } from 'lucide-react'
+import toast from 'react-hot-toast';
+import Markdown from 'react-markdown';
+import axios from 'axios';
 
 const BlogTitles = () => {
   const blogCategories = [
     'General', 'Technology', 'Business', 'Health',
     'Lifestyle', 'Education', 'Travel', 'Food',
   ];
+
+  axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
   const [selectedCategory, setSelectedCategory] = useState('General');
   const [input, setInput] = useState('');
