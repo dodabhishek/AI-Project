@@ -3,11 +3,48 @@
 @import "tailwindcss";
 
 *{
-  font-family: "Outfix" , sans-serif;
+  font-family: "Outfit" , sans-serif;
 }
 
 @theme{
-  --color-primary: #5044E5
+  --color-primary: #5044E5;
+  --color-dark-bg: #0f0f23;
+  --color-dark-surface: #1a1a2e;
+  --color-dark-card: #16213e;
+  --color-dark-border: #2d3748;
+  --color-dark-text: #e2e8f0;
+  --color-dark-text-secondary: #a0aec0;
+}
+
+/* Dark theme styles */
+body {
+  background-color: var(--color-dark-bg);
+  color: var(--color-dark-text);
+}
+
+/* Dark theme utility classes */
+.dark-bg {
+  background-color: var(--color-dark-bg);
+}
+
+.dark-surface {
+  background-color: var(--color-dark-surface);
+}
+
+.dark-card {
+  background-color: var(--color-dark-card);
+}
+
+.dark-border {
+  border-color: var(--color-dark-border);
+}
+
+.dark-text {
+  color: var(--color-dark-text);
+}
+
+.dark-text-secondary {
+  color: var(--color-dark-text-secondary);
 }
 
 /* In your index.css or a global CSS file */

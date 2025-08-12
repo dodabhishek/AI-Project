@@ -52,11 +52,11 @@ const Community = () => {
   }, [user]);
 
   return !loading ? (
-    <div className='flex-1 h-full flex flex-col gap-4 p-6'>
-      <h2 className='text-lg font-semibold mb-2'>Creations</h2>
-      <div className='bg-white h-full w-full rounded-xl overflow-y-scroll'>
+    <div className='flex-1 h-full flex flex-col gap-4 p-6 dark-bg'>
+      <h2 className='text-lg font-semibold mb-2 dark-text'>Creations</h2>
+      <div className='dark-card h-full w-full rounded-xl overflow-y-scroll border dark-border shadow-lg'>
         {creations.length === 0 ? (
-          <div className='text-center text-gray-400 py-10'>No creations found.</div>
+          <div className='text-center dark-text-secondary py-10'>No creations found.</div>
         ) : (
           creations.map((creation) => (
             <div
@@ -72,7 +72,7 @@ const Community = () => {
                   <p>{creation.likes.length}</p>
                   <Heart
                     onClick={() => imageLikeToggle(creation.id)}
-                    className={`min-w-5 h-5 hover:scale-110 cursor-pointer ${creation.likes.includes(user.id) ? 'fill-red-500 text-red-600 ' : 'text-white'}`}
+                    className={`min-w-5 h-5 hover:scale-110 cursor-pointer transition-transform ${creation.likes.includes(user.id) ? 'fill-red-500 text-red-600 ' : 'text-white'}`}
                   />
                 </div>
               </div>

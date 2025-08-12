@@ -47,37 +47,37 @@ const BlogTitles = () => {
   };
 
   return (
-    <div className="h-full overflow-y-scroll p-6 items-start flex-wrap gap-4 flex text-slate-700">
+    <div className="h-full overflow-y-scroll p-6 items-start flex-wrap gap-4 flex dark-bg">
       {/* Left column */}
       <form
-        className="w-full max-w-lg p-4 bg-white rounded-lg border border-gray-200"
+        className="w-full max-w-lg p-4 dark-card rounded-lg border dark-border shadow-lg"
         onSubmit={onSubmitHandler}
       >
         <div className="flex items-center gap-3">
-          <Sparkles className="w-6 text-[#8E37EB]" />
-          <h1 className="text-xl font-semibold">AI Title Generator</h1>
+          <Sparkles className="w-6 text-primary" />
+          <h1 className="text-xl font-semibold dark-text">AI Title Generator</h1>
         </div>
 
-        <p className="mt-6 text-sm font-medium">Keyword</p>
+        <p className="mt-6 text-sm font-medium dark-text">Keyword</p>
         <input
           onChange={(e) => setInput(e.target.value)}
           value={input}
           type="text"
-          className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300"
+          className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border dark-border bg-dark-surface dark-text placeholder-gray-400 focus:ring-2 focus:ring-primary/50"
           placeholder="The future of artificial intelligence is ..."
           required
         />
 
-        <p className="mt-4 text-sm font-medium">Category</p>
+        <p className="mt-4 text-sm font-medium dark-text">Category</p>
         <div className="mt-3 flex gap-3 flex-wrap">
           {blogCategories.map((item) => (
             <span
               key={item}
               onClick={() => setSelectedCategory(item)}
-              className={`text-xs px-4 py-1 border rounded-full cursor-pointer transition ${
+              className={`text-xs px-4 py-1 border rounded-full cursor-pointer transition-colors ${
                 selectedCategory === item
-                  ? "bg-purple-50 text-purple-700 font-medium border-purple-300"
-                  : "text-gray-500 border-gray-300 hover:border-gray-400"
+                  ? "bg-primary text-white font-medium border-primary"
+                  : "text-gray-400 border-gray-600 hover:border-primary/50 hover:text-primary"
               }`}
             >
               {item}
@@ -89,7 +89,7 @@ const BlogTitles = () => {
         disabled = {loading}
           type="submit"
           className="w-full flex justify-center items-center gap-2 bg-gradient-to-r
-          from-[#C341F6] to-[#8E37EB] text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer"
+          from-primary to-primary/80 text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer hover:from-primary/90 hover:to-primary/70 transition-all duration-200 shadow-lg hover:shadow-primary/25 disabled:opacity-50"
         >
           {loading ? <span className="w-4 h-4 my-1 rounded-full border-2 border-t-transparent animate-spin"></span> : <Hash className="w-5" />}
           
@@ -98,30 +98,30 @@ const BlogTitles = () => {
       </form>
 
       {/* Right column */}
-      <div className="w-full max-w-lg p-4 bg-white rounded-lg flex flex-col border border-gray-200 min-h-96">
+      <div className="w-full max-w-lg p-4 dark-card rounded-lg flex flex-col border dark-border min-h-96 shadow-lg">
         <div className="flex items-center gap-3">
-          <Hash className="w-5 h-5 text-[#8E37EB]" />
-          <h1 className="text-xl font-semibold">Generated Titles</h1>
+          <Hash className="w-5 h-5 text-primary" />
+          <h1 className="text-xl font-semibold dark-text">Generated Titles</h1>
         </div>
           {!content ? (<div className="flex-1 flex justify-center items-center">
-          <div className="text-sm flex flex-col items-center gap-5 text-gray-400 text-center">
+          <div className="text-sm flex flex-col items-center gap-5 dark-text-secondary text-center">
             <Hash className="w-9 h-9" />
             <p>Enter a topic and click "Generate Title" to get started</p>
           </div>
         </div>) : (
-          <div className='mt-3 h-full overflow-y-scroll text-sm text-slate-600'>
+          <div className='mt-3 h-full overflow-y-scroll text-sm dark-text'>
                       <Markdown
                         components={{
                           p: ({node, ...props}) => <p className="mb-2" {...props} />,
-                          h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-2" {...props} />,
-                          h2: ({node, ...props}) => <h2 className="text-xl font-semibold my-2" {...props} />,
+                          h1: ({node, ...props}) => <h1 className="text-2xl font-bold my-2 dark-text" {...props} />,
+                          h2: ({node, ...props}) => <h2 className="text-xl font-semibold my-2 dark-text" {...props} />,
                           ul: ({node, ...props}) => <ul className="list-disc ml-6 mb-2" {...props} />,
                           ol: ({node, ...props}) => <ol className="list-decimal ml-6 mb-2" {...props} />,
                           li: ({node, ...props}) => <li className="mb-1" {...props} />,
-                          strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-semibold dark-text" {...props} />,
                           em: ({node, ...props}) => <em className="italic" {...props} />,
-                          blockquote: ({node, ...props}) => <blockquote className="border-l-4 pl-4 italic text-gray-500 my-2" {...props} />,
-                          code: ({node, ...props}) => <code className="bg-gray-100 px-1 rounded" {...props} />,
+                          blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary/50 pl-4 italic dark-text-secondary my-2" {...props} />,
+                          code: ({node, ...props}) => <code className="bg-gray-800 px-1 rounded text-gray-200" {...props} />,
                         }}
                       >
                         {content}
